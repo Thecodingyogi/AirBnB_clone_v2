@@ -23,7 +23,8 @@ class BaseModel:
             self.updated_at = datetime.utcnow()
         else:
             for key, value in kwargs.items():
-                setattr(self, key, value)
+                if key != '__class__':
+                    setattr(self, key, value)
 
     def __str__(self):
         """Returns a string representation of the instance"""
