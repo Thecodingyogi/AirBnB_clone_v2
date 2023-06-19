@@ -1,9 +1,11 @@
 #!/usr/bin/python3
 """ Console Module """
 import cmd
+from shlex import split
 import sys
 from models.base_model import BaseModel
-from models.__init__ import storage
+from models import storage
+from datetime import datetime
 from models.user import User
 from models.place import Place
 from models.state import State
@@ -19,10 +21,14 @@ class HBNBCommand(cmd.Cmd):
     prompt = '(hbnb) ' if sys.__stdin__.isatty() else ''
 
     classes = {
-               'BaseModel': BaseModel, 'User': User, 'Place': Place,
-               'State': State, 'City': City, 'Amenity': Amenity,
-               'Review': Review
-              }
+        'BaseModel': BaseModel,
+        'User': User,
+        'Place': Place,
+        'State': State,
+        'City': City,
+        'Amenity': Amenity,
+        'Review': Review
+    }
     dot_cmds = ['all', 'count', 'show', 'destroy', 'update']
     types = {
              'number_rooms': int, 'number_bathrooms': int,
@@ -115,34 +121,34 @@ class HBNBCommand(cmd.Cmd):
 
     def do_create(self, args):
         """ Create an object of any class"""
-        if not args:
-            print("** class name missing **")
-            return
-        args_list = args.split()
-        class_name = args_list[0]
+        try:
+            if not args:
+                raise SyntaxError()
+            args_list = args.split(" ")
+            kwargs = {}
 
-        if class_name not in HBNBCommand.classes:
-            print("** class doesn't exist **")
-            return
-        params = {}
-        for param in args_list[1:]:
-            if '=' in param:
-                key, value = param.split('=')
-                value = value.replace('_', ' ')
-                if value.startswith('"') and value.endswith('"'):
-                    value = value[1:-1].replace('\\"', '"')
+            for i in range(1, len(args_list)):
+                key, value = tuple(args_list[i].split("="))
+                if value[0] == '"':
+                    value = value.strip('"').replace("_", " ")
                 else:
                     try:
-                        value = int(value)
-                    except ValueError:
-                        try:
-                            value = float(value)
-                        except ValueError:
-                            continue
-                params[key] = value
-        new_instance = HBNBCommand.classes[class_name](**params)
-        new_instance.save()
-        print(new_instance.id)
+                        value = eval(value)
+                    except (SyntaxError, NameError):
+                        continue
+                kwargs[key] = value
+            if kwargs == {}:
+                obj = eval(args_list[0])()
+            else:
+                obj = eval(args_list[0])(**kwargs)
+                storage.new(obj)
+            print(obj.id)
+            obj.save()
+        except SyntaxError:
+            print("** class name missing **")
+        except NameError:
+            print("** class doesn't exist **")
+
 
     def help_create(self):
         """ Help information for the create method """

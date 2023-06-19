@@ -33,7 +33,9 @@ class BaseModel:
 
     def save(self):
         """Updates updated_at with current time when instance is changed"""
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now()
+        if self.created_at is None:
+            self.created_at = self.updated_at
         storage.new(self)
         storage.save()
 
@@ -44,7 +46,9 @@ class BaseModel:
         """Convert instance into dict format"""
         dictionary = self.__dict__.copy()
         dictionary['__class__'] = type(self).__name__
-        dictionary['created_at'] = self.created_at.isoformat()
-        dictionary['updated_at'] = self.updated_at.isoformat()
+        if self.created_at:
+            dictionary['created_at'] = self.created_at.isoformat()
+        if self.updated_at:
+            dictionary['updated_at'] = self.updated_at.isoformat()
         dictionary.pop('_sa_instance_state', None)
         return dictionary

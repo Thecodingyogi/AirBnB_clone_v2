@@ -21,7 +21,8 @@ class FileStorage:
 
     def new(self, obj):
         """Adds new object to storage dictionary"""
-        self.all().update({obj.to_dict()['__class__'] + '.' + obj.id: obj})
+        if obj:
+            self.all().update({obj.to_dict()['__class__'] + '.' + obj.id: obj})
 
     def save(self):
         """Saves storage dictionary to file"""
@@ -50,11 +51,20 @@ class FileStorage:
         try:
             temp = {}
             with open(FileStorage.__file_path, 'r') as f:
-                temp = json.load(f)
-                for key, val in temp.items():
-                        self.all()[key] = classes[val['__class__']](**val)
+                data = f.read()
+                if data:
+                    temp = json.loads(data)
+                    for key, val in temp.items():
+                        cls_name = val.get('__class__')
+                        cls = classes.get(cls_name)
+                        if cls:
+                            self.all()[key] = cls(**val)
         except FileNotFoundError:
             pass
+        except json.JsonDecoderError:
+            pass
+        except Exception as e:
+            print("an error occured while reloading the file", str(e))
 
     def delete(self, obj=None):
         """Deletes objects"""
