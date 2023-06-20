@@ -32,4 +32,3 @@ class City(BaseModel, Base):
         initializes cities
         """
         super().__init__(*args, **kwargs)
-
