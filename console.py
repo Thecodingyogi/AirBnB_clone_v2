@@ -16,7 +16,6 @@ from models.review import Review
 
 class HBNBCommand(cmd.Cmd):
     """ Contains the functionality for the HBNB console"""
-
     prompt = '(hbnb) '
 
     classes = {
@@ -47,11 +46,11 @@ class HBNBCommand(cmd.Cmd):
         EOF Signal to exit the program
         """
         return True
-     def help_quit(self):
-         """
-         Prints the help documentation for quit
-         """
-         print("Exits the program by entering the command quit\n")
+    def help_quit(self):
+        """
+        Prints the help documentation for quit
+        """
+        print("Exits the program by entering the command quit\n")
 
     def help_EOF(self):
         """
@@ -59,39 +58,38 @@ class HBNBCommand(cmd.Cmd):
         """
         print("Exits the program by entering ctrl+D\n")
 
+    def do_create(self, args):
+        """
+        Create an object of any class
+        that is specified in the command
+        """
+        try:
+            if not args:
+                raise SyntaxError()
+            args_list = args.split(" ")
+            kwargs = {}
 
-   def do_create(self, args):
-    """
-    Create an object of any class
-    that is specified in the command
-    """
-    try:
-        if not args:
-            raise SyntaxError()
-        args_list = args.split(" ")
-        kwargs = {}
-
-        for i in range(1, len(args_list)):
-            key, value = tuple(args_list[i].split("="))
-            if value[0] == '"':
-                value = value.strip('"').replace("_", " ")
+            for i in range(1, len(args_list)):
+                key, value = tuple(args_list[i].split("="))
+                if value[0] == '"':
+                    value = value.strip('"').replace("_", " ")
+                else:
+                    try:
+                        value = eval(value)
+                    except (SyntaxError, NameError):
+                        continue
+                kwargs[key] = value
+            if kwargs == {}:
+                obj = eval(args_list[0])()
             else:
-                try:
-                    value = eval(value)
-                except (SyntaxError, NameError):
-                    continue
-            kwargs[key] = value
-        if kwargs == {}:
-            obj = eval(args_list[0])()
-        else:
-            obj = eval(args_list[0])(**kwargs)
-            storage.new(obj)
-        print(obj.id)
-        obj.save()
-    except SyntaxError:
-        print("** class name missing **")
-    except NameError:
-        print("** class doesn't exist **")
+                obj = eval(args_list[0])(**kwargs)
+                storage.new(obj)
+            print(obj.id)
+            obj.save()
+        except SyntaxError:
+            print("** class name missing **")
+        except NameError:
+            print("** class doesn't exist **")
 
 
     def help_create(self):
