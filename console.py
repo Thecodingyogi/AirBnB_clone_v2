@@ -1,16 +1,16 @@
 #!/usr/bin/python3
 """ Console Module """
+import sys
 import cmd
 from shlex import split
-import sys
-from models.base_model import BaseModel
 from models import storage
 from datetime import datetime
+from models.base_model import BaseModel
 from models.user import User
-from models.place import Place
 from models.state import State
 from models.city import City
 from models.amenity import Amenity
+from models.place import Place
 from models.review import Review
 
 
@@ -222,22 +222,27 @@ class HBNBCommand(cmd.Cmd):
         print("[Usage]: destroy <className> <objectId>\n")
 
     def do_all(self, args):
-        """ Shows all objects, or all objects of a class"""
-        print_list = []
+        """
+        Shows all objects, or all objects of a class
+        this should display the string representation of all
+        instances of a give class
+        if no class is specified displays all instantiated objects
+        """
+        if not args:
+            o = storage.all()
+            print([o[k].__str__() for k in o])
+            return
+        some_list = []
 
         if args:
-            args = args.split(' ')[0]  # remove possible trailing args
-            if args not in HBNBCommand.classes:
+            args = args.split(" ")
+            if args[0] not in self.classes:
                 print("** class doesn't exist **")
                 return
-            for k, v in storage._FileStorage__objects.items():
-                if k.split('.')[0] == args:
-                    print_list.append(str(v))
-        else:
-            for k, v in storage._FileStorage__objects.items():
-                print_list.append(str(v))
-
-        print(print_list)
+            o = storage.all(args[0])
+            for k, v in o.items():
+                some_list.append(v)
+            print(some_list)
 
     def help_all(self):
         """ Help information for the all command """
