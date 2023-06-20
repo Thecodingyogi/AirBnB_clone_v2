@@ -2,12 +2,9 @@
 """ Review module for the HBNB project """
 import models
 from models.base_model import BaseModel, Base
+from os import getenv
 import sqlalchemy
 from sqlalchemy import Column, String, ForeignKey
-from models.city import City
-from models.user import User
-from os import getenv
-from models.place import Place
 
 
 class Review(BaseModel, Base):

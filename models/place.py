@@ -9,7 +9,6 @@ from os import getenv
 from sqlalchemy.orm import relationship
 from models.review import Review
 from models.user import User
-from models.city import City
 
 class Place(BaseModel, Base):
     """
@@ -28,6 +27,7 @@ class Place(BaseModel, Base):
         latitude = Column(Float, nullable=False)
         longitude = Column(Float, nullable=False)
         amenity_ids = []
+        reviews = relationship("Review", backref="place", cascade="all, delete")
 
     else:
         city_id = ""
@@ -41,3 +41,18 @@ class Place(BaseModel, Base):
         latitude = 0.0
         longitude = 0.0
         amenity_ids = []
+
+    if getenv("HBNB_TYPE_STORAGE") != "db":
+        @property
+        def reviews(self):
+            """
+            this is a getter method that returns the list
+            of review instances
+            """
+            from models.review import Review
+            review_list = []
+            all_reviews = model.storage.all(Review)
+            for review in all_reviews.values():
+                if review.place_id == self.id:
+                    review_list.append(review)
+            return review_list
