@@ -17,8 +17,7 @@ from models.review import Review
 class HBNBCommand(cmd.Cmd):
     """ Contains the functionality for the HBNB console"""
 
-    # determines prompt for interactive/non-interactive modes
-    prompt = '(hbnb) ' if sys.__stdin__.isatty() else ''
+    prompt = '(hbnb) '
 
     classes = {
         'BaseModel': BaseModel,
@@ -29,125 +28,70 @@ class HBNBCommand(cmd.Cmd):
         'Amenity': Amenity,
         'Review': Review
     }
-    dot_cmds = ['all', 'count', 'show', 'destroy', 'update']
-    types = {
-             'number_rooms': int, 'number_bathrooms': int,
-             'max_guest': int, 'price_by_night': int,
-             'latitude': float, 'longitude': float
-            }
-
-    def preloop(self):
-        """Prints if isatty is false"""
-        if not sys.__stdin__.isatty():
-            print('(hbnb)')
-
-    def precmd(self, line):
-        """Reformat command line for advanced command syntax.
-
-        Usage: <class name>.<command>([<id> [<*args> or <**kwargs>]])
-        (Brackets denote optional fields in usage example.)
-        """
-        _cmd = _cls = _id = _args = ''  # initialize line elements
-
-        # scan for general formating - i.e '.', '(', ')'
-        if not ('.' in line and '(' in line and ')' in line):
-            return line
-
-        try:  # parse line left to right
-            pline = line[:]  # parsed line
-
-            # isolate <class name>
-            _cls = pline[:pline.find('.')]
-
-            # isolate and validate <command>
-            _cmd = pline[pline.find('.') + 1:pline.find('(')]
-            if _cmd not in HBNBCommand.dot_cmds:
-                raise Exception
-
-            # if parantheses contain arguments, parse them
-            pline = pline[pline.find('(') + 1:pline.find(')')]
-            if pline:
-                # partition args: (<id>, [<delim>], [<*args>])
-                pline = pline.partition(', ')  # pline convert to tuple
-
-                # isolate _id, stripping quotes
-                _id = pline[0].replace('\"', '')
-                # possible bug here:
-                # empty quotes register as empty _id when replaced
-
-                # if arguments exist beyond _id
-                pline = pline[2].strip()  # pline is now str
-                if pline:
-                    # check for *args or **kwargs
-                    if pline[0] is '{' and pline[-1] is'}'\
-                            and type(eval(pline)) is dict:
-                        _args = pline
-                    else:
-                        _args = pline.replace(',', '')
-                        # _args = _args.replace('\"', '')
-            line = ' '.join([_cmd, _cls, _id, _args])
-
-        except Exception as mess:
-            pass
-        finally:
-            return line
-
-    def postcmd(self, stop, line):
-        """Prints if isatty is false"""
-        if not sys.__stdin__.isatty():
-            print('(hbnb) ', end='')
-        return stop
-
-    def do_quit(self, command):
-        """ Method to exit the HBNB console"""
-        exit()
-
-    def help_quit(self):
-        """ Prints the help documentation for quit  """
-        print("Exits the program with formatting\n")
-
-    def do_EOF(self, arg):
-        """ Handles EOF to exit program """
-        print()
-        exit()
-
-    def help_EOF(self):
-        """ Prints the help documentation for EOF """
-        print("Exits the program without formatting\n")
 
     def emptyline(self):
-        """ Overrides the emptyline method of CMD """
+        """
+        ignore input empty line and return the prompt again
+        in the process override the default emptyline()
+        """
         pass
 
-    def do_create(self, args):
-        """ Create an object of any class"""
-        try:
-            if not args:
-                raise SyntaxError()
-            args_list = args.split(" ")
-            kwargs = {}
+    def do_quit(self, arg):
+        """
+        the command to quit the console interpreter
+        """
+        return True
 
-            for i in range(1, len(args_list)):
-                key, value = tuple(args_list[i].split("="))
-                if value[0] == '"':
-                    value = value.strip('"').replace("_", " ")
-                else:
-                    try:
-                        value = eval(value)
-                    except (SyntaxError, NameError):
-                        continue
-                kwargs[key] = value
-            if kwargs == {}:
-                obj = eval(args_list[0])()
+    def do_EOF(self, arg):
+        """
+        EOF Signal to exit the program
+        """
+        return True
+     def help_quit(self):
+         """
+         Prints the help documentation for quit
+         """
+         print("Exits the program by entering the command quit\n")
+
+    def help_EOF(self):
+        """
+        Prints the help documentation for EOF
+        """
+        print("Exits the program by entering ctrl+D\n")
+
+
+   def do_create(self, args):
+    """
+    Create an object of any class
+    that is specified in the command
+    """
+    try:
+        if not args:
+            raise SyntaxError()
+        args_list = args.split(" ")
+        kwargs = {}
+
+        for i in range(1, len(args_list)):
+            key, value = tuple(args_list[i].split("="))
+            if value[0] == '"':
+                value = value.strip('"').replace("_", " ")
             else:
-                obj = eval(args_list[0])(**kwargs)
-                storage.new(obj)
-            print(obj.id)
-            obj.save()
-        except SyntaxError:
-            print("** class name missing **")
-        except NameError:
-            print("** class doesn't exist **")
+                try:
+                    value = eval(value)
+                except (SyntaxError, NameError):
+                    continue
+            kwargs[key] = value
+        if kwargs == {}:
+            obj = eval(args_list[0])()
+        else:
+            obj = eval(args_list[0])(**kwargs)
+            storage.new(obj)
+        print(obj.id)
+        obj.save()
+    except SyntaxError:
+        print("** class name missing **")
+    except NameError:
+        print("** class doesn't exist **")
 
 
     def help_create(self):
