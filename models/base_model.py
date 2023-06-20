@@ -15,19 +15,23 @@ if getenv("HBNB_TYPE_STORAGE") == "db":
 else:
     Base = object
 
+
 class BaseModel:
     """
     A base class for all hbnb models
     """
     if getenv("HBNB_TYPE_STORAGE") == "db":
         id = Column(String(60), primary_key=True, nullable=False)
-        created_at = Column(DateTime, nullable=False, default=datetime.utcnow())
-        updated_at = Column(DateTime, nullable=False, default=datetime.utcnow())
+        created_at = Column(DateTime, nullable=False,
+                            default=datetime.utcnow())
+        updated_at = Column(DateTime, nullable=False,
+                            default=datetime.utcnow())
+
     def __init__(self, *args, **kwargs):
         """Instatntiates a new model"""
         if kwargs:
             self.id = str(uuid.uuid4())
-            self.created_at = datetime.now()
+            self.created_at = self.updated_at = datetime.now()
             for key, value in kwargs.items():
                 if key == "created_at" or key == "updated_at":
                     value = datetime.strptime(value, time)
@@ -43,7 +47,8 @@ class BaseModel:
         Returns a string representation of class BaseModel
         prints: "[<class name>] (<self.id>)<self.__dict__>"
         """
-        return "[{}] ({}) {}".format(self.__class__.__name__, self.id, self.__dict__)
+        return "[{}] ({}) {}".format(self.__class__.__name__,
+                                     self.id, self.__dict__)
 
     def __repr__(self):
         """

@@ -3,8 +3,6 @@
 This module automatically instantiates the models package
 """
 from os import getenv
-from models.engine.file_storage import FileStorage
-from models.engine.db_storage import DBStorage
 
 if getenv("HBNB_TYPE_STORAGE") == 'db':
     from models.engine.db_storage import DBStorage

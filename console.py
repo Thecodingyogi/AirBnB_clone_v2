@@ -46,6 +46,7 @@ class HBNBCommand(cmd.Cmd):
         EOF Signal to exit the program
         """
         return True
+
     def help_quit(self):
         """
         Prints the help documentation for quit
@@ -90,7 +91,6 @@ class HBNBCommand(cmd.Cmd):
             print("** class name missing **")
         except NameError:
             print("** class doesn't exist **")
-
 
     def help_create(self):
         """ Help information for the create method """

@@ -26,13 +26,12 @@ class State(BaseModel, Base):
         super().__init__(*args, **kwargs)
 
     if getenv('HBNB_TYPE_STORAGE') != "db":
-
         @property
         def cities(self):
             """
             getter for list of city instances related to the state
             """
-            city_list=[]
+            city_list = []
             all_cities = models.storage.all(City)
             for city in all_cities.values():
                 if city.state_id == self.id:
