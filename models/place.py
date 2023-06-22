@@ -8,6 +8,7 @@ from os import getenv
 from sqlalchemy.orm import relationship
 from models.user import User
 import sqlalchemy
+from sqlalchemy.ext.declarative import declarative_base
 
 
 place_amenity = Table("place_amenity", Base.metadata,

@@ -17,15 +17,10 @@ class City(BaseModel, Base):
     """
     contains name and state_id attributes
     """
-    if getenv("HBNB_TYPE_STORAGE") == "db":
-        __tablename__ = 'cities'
-        state_id = Column(String(60), ForeignKey('states.id'), nullable=False)
-        name = Column(String(128), nullable=False)
-        places = relationship("Place", backref="cities", cascade="all, delete")
-
-    else:
-        state_id = ""
-        name = ""
+    __tablename__ = 'cities'
+    state_id = Column(String(60), ForeignKey('states.id'), nullable=False)
+    name = Column(String(128), nullable=False)
+    places = relationship("Place", backref="cities", cascade="all, delete")
 
     def __init__(self, *args, **kwargs):
         """
