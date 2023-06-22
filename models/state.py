@@ -19,12 +19,13 @@ class State(BaseModel, Base):
         """Initialize State attribute"""
         super().__init__(*args, **kwargs)
 
-    @property
-    def cities(self):
-        """Getter for cities"""
-        city_list = []
-        all_cities = models.storage.all(City)
-        for city in all_cities.values():
-            if city.state_id == self.id:
-                city_list.append(city)
-                return city_list
+    if getenv("HBNB_TYPE_STORAGE") != "db":
+        @property
+        def cities(self):
+            """Getter for cities"""
+            city_list = []
+            all_cities = models.storage.all(City)
+            for city in all_cities.values():
+                if city.state_id == self.id:
+                    city_list.append(city)
+                    return city_list
