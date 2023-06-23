@@ -69,7 +69,6 @@ class HBNBCommand(cmd.Cmd):
                 raise SyntaxError()
             args_list = args.split(" ")
             kwargs = {}
-
             for i in range(1, len(args_list)):
                 key, value = tuple(args_list[i].split("="))
                 if value[0] == '"':
