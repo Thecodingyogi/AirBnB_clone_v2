@@ -29,8 +29,7 @@ class FileStorage:
                 if cls == v.__class__ or cls == v.__class__.__name__:
                     some_dict[k] = v
             return some_dict
-        else:
-            return self.__objects
+        return self.__objects
 
     def new(self, obj):
         """
