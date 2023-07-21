@@ -66,13 +66,11 @@ class BaseModel:
 
     def to_dict(self):
         """Convert instance into dict format"""
-        new_dict = self.__dict__.copy()
-        if "created_at" in new_dict:
-            new_dict["created_at"] = new_dict["created_at"].strftime(time)
-        if "updated_at" in new_dict:
-            new_dict["updated_at"] = new_dict["updated_at"].strftime(time)
-        new_dict["__class__"] = self.__class__.__name__
-        if "_sa_instance_state" in new_dict:
-            del new_dict["_sa_instance_state"]
-
-        return new_dict
+        dct = self.__dict__.copy()
+        dct['__class__'] = self.__class__.__name__
+        for k in dct:
+            if type(dct[k]) is datetime:
+                dct[k] = dct[k].isoformat()
+        if '_sa_instance_state' in dct.keys():
+            del(dct['_sa_instance_state'])
+        return dct

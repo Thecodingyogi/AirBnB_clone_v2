@@ -49,21 +49,19 @@ class DBStorage:
         this func should return dictionary with all objects depending
         on the clas name arg(cls)
         """
-        if cls:
-            objs = self.__session.query(classes[cls])
+        dct = {}
+        if cls is None:
+            for c in classes.values():
+                objs = self.__session.query(c).all()
+                for obj in objs:
+                    key = obj.__class__.__name__ + '.' + obj.id
+                    dct[key] = obj
         else:
-            objs = self.__session.query(State).all()
-            objs += self.__session.query(City).all()
-            objs += self.__session.query(User).all()
-            objs += self.__session.query(Place).all()
-            objs += self.__session.query(Amenity).all()
-            objs += self.__session.query(Review).all()
-
-        a_dict = {}
-        for obj in objs:
-            k = '{}.{}'.format(type(obj).__name__, obj.id)
-            a_dict[k] = obj
-        return a_dict
+            objs = self.__session.query(cls).all()
+            for obj in objs:
+                key = obj.__class__.__name__ + '.' + obj.id
+                dct[key] = obj
+        return dct
 
     def new(self, obj):
         """
