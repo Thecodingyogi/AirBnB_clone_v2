@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 """Script that starts a Flask web application"""
 from flask import Flask, render_template
-from models import Storage
+from models import storage
+from models.state import State
 
 app = Flask(__name__)
 
@@ -12,12 +13,11 @@ def states_list():
         and sorts them by name.
     """
     states = storage.all(State)
-    sorted_states = sorted(states.values(), key=lambda state: state.name)
-    return render_template("7-states_list.html", states=sorted_states)
+    return render_template("7-states_list.html", states=states)
 
 
 @app.teardown_appcontext
-def teardown_session():
+def teardown_session(exception):
     """Removes the current SQLAlchemy Session after each request."""
     storage.close()
 

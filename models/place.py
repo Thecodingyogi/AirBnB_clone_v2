@@ -20,7 +20,8 @@ place_amenity = Table("place_amenity", Base.metadata,
                       Column("amenity_id", String(60),
                              ForeignKey("amenities.id"),
                              primary_key=True,
-                             nullable=False))
+                             nullable=False),
+                      mysql_charset="latin1")
 
 
 class Place(BaseModel, Base):
@@ -28,6 +29,8 @@ class Place(BaseModel, Base):
     a class that represent the places table
     """
     __tablename__ = "places"
+    __table_args__ = (
+                      {'mysql_default_charset': 'latin1'})
     city_id = Column(String(60), ForeignKey('cities.id'), nullable=False)
     user_id = Column(String(60), ForeignKey('users.id'), nullable=False)
     name = Column(String(128), nullable=False)
