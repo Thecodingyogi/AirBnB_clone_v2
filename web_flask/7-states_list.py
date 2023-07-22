@@ -7,19 +7,20 @@ from models.state import State
 app = Flask(__name__)
 
 
+@app.teardown_appcontext
+def teardown_session(exception):
+    """Removes the current SQLAlchemy Session after each request."""
+    storage.close()
+
+
 @app.route("/states_list", strict_slashes=False)
 def states_list():
     """Displays a HTML page by fetching all State objects from Storage
         and sorts them by name.
     """
     states = storage.all(State)
-    return render_template("7-states_list.html", states=states)
-
-
-@app.teardown_appcontext
-def teardown_session(exception):
-    """Removes the current SQLAlchemy Session after each request."""
-    storage.close()
+    sorted_states = sorted(states.values(), key=lambda state: state.name)
+    return render_template("7-states_list.html", states=sorted_states)
 
 
 if __name__ == '__main__':
