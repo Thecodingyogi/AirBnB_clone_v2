@@ -7,17 +7,17 @@ from models.state import State
 app = Flask(__name__)
 
 
-@app.teardown_appcontext
-def teardown_session(exception):
-    """Removes the current SQLAlchemy session after each request"""
-    storage.close()
-
-
 @app.route("/cities_by_states", strict_slashes=False)
 def cities_by_states():
     """Displays a HTML page"""
     states = storage.all(State)
     return render_template("8-cities_by_states.html", states=states)
+
+
+@app.teardown_appcontext
+def teardown_session(exception):
+    """Removes the current SQLAlchemy session after each request"""
+    storage.close()
 
 
 if __name__ == "__main__":
